@@ -1,0 +1,105 @@
+// ===============================
+// BUTTON BASE
+// ===============================
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+
+  padding: 0.8rem 2rem;
+  border-radius: 0.6rem;
+
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  border: none;
+  outline: none;
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  // disabled state
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// ===============================
+// PRIMARY BUTTON
+// ===============================
+.btn--primary {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #fff;
+
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.4);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+// ===============================
+// SECONDARY BUTTON
+// ===============================
+.btn--secondary {
+  background: transparent;
+  border: 1px solid #2a3348;
+  color: #e5e7eb;
+
+  &:hover {
+    border-color: #6366f1;
+    color: #6366f1;
+    background: rgba(99, 102, 241, 0.05);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+// ===============================
+// DANGER BUTTON (optional)
+// ===============================
+.btn--danger {
+  background: #ef4444;
+  color: white;
+
+  &:hover {
+    background: #dc2626;
+  }
+}
+
+// ===============================
+// LOADING STATE
+// ===============================
+.btn--loading {
+  pointer-events: none;
+
+  &::after {
+    content: "";
+    width: 14px;
+    height: 14px;
+    border: 2px solid white;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    margin-left: 6px;
+
+    animation: spin 0.6s linear infinite;
+  }
+}
+
+// ===============================
+// ANIMATION
+// ===============================
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
