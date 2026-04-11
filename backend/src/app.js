@@ -4,29 +4,20 @@ const cors = require('cors');
 
 const app = express();
 
+// ✅ CORS FIRST (VERY IMPORTANT)
+app.use(cors({
+  origin: "https://skill-sight-eight.vercel.app",
+  credentials: true
+}));
+
+// ✅ Other middlewares
 app.use(express.json());
 app.use(cookieParser());
 
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  'http://localhost:5173' // fallback for safety
-].filter(Boolean);
-
+// ✅ Test route
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
-
-const cors = require("cors");
-
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://skill-sight-eight.vercel.app"
-  ],
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
 
 /* routes */
 const authRouter = require('./routes/auth.routes');
