@@ -40,50 +40,52 @@
   border-radius: 999px;
 }
 
-.interview-layout {
-  width: 100%;
-  min-height: 100%;
-  display: flex;
-  background: $bg-card;
 
-  &__left {
-    width: 250px;
-    flex-shrink: 0;
-    height: 100vh;
-    background: $bg-sidebar;
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(12px);
-    padding: 20px;
-    position: relative;
-    overflow: hidden;
-    transition: width 0.2s ease, padding 0.2s ease;
+.nav-item[data-section="download"] {
+  margin-top: auto;
 
-    &.shrunk {
-      width: 60px;
-      padding-top: 44px;
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid rgba(0, 212, 255, 0.25);
 
-      .side-heading,
-      .nav-item .text {
-        display: none;
-      }
+  color: #00d4ff;
 
-      .nav-item {
-        justify-content: center;
-        min-height: 36px;
-        padding: 0.5rem 0.3rem;
-        gap: 0;
-      }
-    }
+  &:hover {
+    background: rgba(0, 212, 255, 0.15);
+    color: #6ee7ff;
+  }
+}
+
+  // 🔥 ICON
+  .nav-icon {
+    width: 18px;
+    height: 18px;
+    opacity: 0.75;
+    transition: 0.2s;
   }
 
-  &__main {
+  // 🔥 TEXT
+  .text {
+    transition: 0.2s;
+  }
+
+
+.interview-layout__left.shrunk .nav-item {
+  justify-content: center;
+  padding: 0.5rem;
+
+  .text {
+    display: none;
+  }
+}
+
+  .interview-layout__main{
     flex: 1;
     width: 100%;
     max-width: 1020px;
     margin: 0 auto;
     padding: 2rem 1.5rem;
   }
-}
+
 
 .shrink-toggle {
   position: absolute;
@@ -160,7 +162,37 @@
   gap: 0.5rem;
   text-align: left;
   cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease;
+  transition: all 0.2s ease;
+
+  &:hover{
+    transform: translateX(3px);
+    background: rgba(255, 255, 255, 0.221);
+  }
+
+  .nav-item--active {
+  background: rgba(255,255,255, 0.221);
+  color: #fff;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 6px;
+    bottom: 6px;
+    width: 3px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.221)
+  }
+}
+
+.nav-item[data-section="technical"] .nav-icon {
+  color: #7c8cff;
+}
+
+.nav-item[data-section="behavioral"] .nav-icon {
+  color: #4ade80;
+}
 
   .nav-icon {
     width: 18px;
@@ -188,37 +220,68 @@
   }
 }
 
-.nav-item--active {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
 .interview-header {
   height: 60px;
   flex-shrink: 0;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   padding: 0 24px;
-  background: rgba(22, 27, 34, 0.66);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(10px);
+
+  /* 🔥 Glass background */
+  background: rgba(22, 27, 34, 0.3);
+  backdrop-filter: blur(12px);
+
+  /* ❌ remove hard border */
+  border-bottom: none;
+
+  /* 🔥 sticky header */
   position: sticky;
   top: 0;
   z-index: 50;
 
+  /* ✅ important for pseudo element */
+  overflow: hidden;
+
+  /* 🔥 smooth separator line */
+  &::after {
+    content: "";
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    bottom: 0;
+    height: 1px;
+
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(255, 255, 255, 0.18),
+      transparent
+    );
+  }
+
+  &__left {
+    display: flex;
+    flex-direction: column;
+  }
+
   &__title {
     margin: 0;
-    font-size: 1.35rem;
-    font-weight: 700;
+    font-size: 1.8rem;
+    font-weight: 800;
+    font-variant: small-caps;
     color: $text-primary;
   }
 
   &__actions {
     display: flex;
     gap: 0.75rem;
+    align-items: center;
   }
 }
+ 
 
 .theme-toggle {
   width: 34px;
@@ -266,29 +329,25 @@
   padding: 0.15rem 0.5rem;
 }
 
-.question-group {
-  margin: 0.75rem 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-}
-
 .question-card {
   background: transparent;
   border: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 0;
   padding: 0.85rem 0.1rem;
-  transition: background-color 0.18s ease, border-color 0.18s ease;
+  transition: all 0.2s ease;
 
   &:hover {
     background: rgba(255, 255, 255, 0.02);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
   }
 
   &--open {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba($accent, 0.4);
     border-radius: 10px;
+    box-shadow: 0 0 0 1px rgba($accent, 0.15);
     padding: 0.9rem 0.85rem;
     margin: 0.35rem 0;
   }
@@ -502,26 +561,15 @@
     border-right: 1px solid rgba(15, 23, 42, 0.1);
   }
 
-  .interview-header {
-    background: rgba(255, 255, 255, 0.85);
-    border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+  .interview-header__title{
+  color: #0f172a;
+  font-weight: 200;
   }
 
-  .interview-header__title,
   .content-header h1,
   .question-card__question,
   .roadmap-focus {
     color: #0f172a;
-  }
-
-  .nav-item {
-    color: #4b5563;
-  }
-
-  .nav-item:hover,
-  .nav-item--active {
-    color: #0f172a;
-    background: rgba(15, 23, 42, 0.08);
   }
 
   .question-card {
@@ -562,10 +610,6 @@
       .side-heading,
       .nav-item .text {
         display: none;
-      }
-
-      .nav-item {
-        justify-content: center;
       }
     }
   }
@@ -646,7 +690,7 @@ $font-stack: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, s
   min-height: 0;
 }
 
-.interview-layout {
+.interview-layout { // //
   width: 100%;
   height: auto;
   min-height: 100%;
@@ -691,14 +735,6 @@ $font-stack: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, s
       .side-heading,
       .nav-item .text {
         display: none;
-      }
-
-      .nav-item {
-        justify-content: center;
-        padding: 0.5rem 0.3rem;
-        min-height: 36px;
-        gap: 0;
-        font-size: 0;
       }
 
       .nav-item .nav-icon {
@@ -805,7 +841,7 @@ $font-stack: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, s
   }
 }
 
-.nav-item {
+.nav-item { // main//
   width: 100%;
   display: flex;
   align-items: center;
@@ -868,6 +904,8 @@ $font-stack: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, s
   align-items: center;
   margin: 0 0 1.5rem 0;
   max-width: none;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 0.6rem;
 
   h1 {
     margin: 0;
@@ -1065,9 +1103,19 @@ $font-stack: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, s
   }
 }
 
+.score-title {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #9aa6b8;
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .score-ring {
   width: 116px;
   height: 116px;
+  margin-top: 2rem;
   border-radius: 50%;
   margin: 0.35rem auto 0.4rem;
    background: conic-gradient(
@@ -1112,6 +1160,7 @@ $font-stack: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, s
 
 .roadmap-item {
   display: flex;
+  padding-left: 0.5rem;
   gap: 0.85rem;
   align-items: flex-start;
   position: relative;
@@ -1136,6 +1185,7 @@ $font-stack: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, s
   width: 10px;
   height: 10px;
   margin-top: 0.36rem;
+  transform: scale(1.1);
   border-radius: 50%;
   background: $bg-page;
   border: 2px solid $accent;
@@ -1203,41 +1253,6 @@ $font-stack: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, s
   }
 }
 
-.interview-header {
-  height: 60px;
-  flex-shrink: 0;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  padding: 0 24px;
-
-  background: rgba(22, 27, 34, 0.6);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-
-  position: sticky;
-  top: 0;
-  z-index: 50;
-
-  &__left {
-    display: flex;
-    flex-direction: column;
-  }
-
-  &__title {
-    margin: 0;
-    font-size: 1.8rem;
-    font-weight: 800;
-    font-variant: small-caps;
-  }
-
-  &__actions {
-    display: flex;
-    gap: 0.75rem;
-  }
-}
 
 .theme-toggle {
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -1290,12 +1305,6 @@ $font-stack: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, s
     box-shadow: 4px 0 20px rgba(15, 23, 42, 0.08);
   }
 
-  .interview-header {
-    background: rgba(255, 255, 255, 0.85);
-    border-bottom: 1px solid rgba(15, 23, 42, 0.1);
-  }
-
-  .interview-header__title,
   .content-header h1,
   .question-card__question {
     color: #0f172a;
@@ -1305,21 +1314,35 @@ $font-stack: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, s
     border-bottom: 1px solid rgba(15, 23, 42, 0.1);
   }
 
-  .question-card__meta,
+  .question-card__meta
+  {
+   color: #475569;
+   text-align: center;
+   padding: 1.5rem;
+   opacity: 0.6;
+  }
+
   .question-card__details p,
   .roadmap-tasks li {
     color: #475569;
   }
 
-  .nav-item {
-    color: #4b5563;
-  }
+  .nav-item::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: $accent;
+  opacity: 0;
+  border-radius: 4px;
+  transition: 0.2s;
+}
 
-  .nav-item:hover,
-  .nav-item--active {
-    color: #0f172a;
-    background: rgba(15, 23, 42, 0.08);
-  }
+.nav-item:hover::before{
+  opacity: 1;
+}
 
   .theme-toggle {
     border-color: rgba(15, 23, 42, 0.18);
@@ -1338,4 +1361,33 @@ $font-stack: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, s
     rgba(255,255,255,0.12),
     transparent
   );
+}
+
+.share-btn {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  appearance: none !important;
+  background: none !important;
+
+  background: rgba(255,255,255,0.05);
+  color: $text-primary;
+  
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.share-btn:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.share-btn:focus {
+  outline: none;
+  box-shadow: none;
 }

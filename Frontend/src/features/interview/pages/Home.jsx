@@ -1,142 +1,203 @@
-import React, { useState, useEffect, useRef } from 'react'
-import "../styles/home.scss"
-import { useInterview } from '../hooks/useinterview.js'
-import { useNavigate } from 'react-router-dom'
+import React, { useState, useEffect, useRef } from "react";
+import "../styles/home.scss";
+import { useInterview } from "../hooks/useinterview.js";
+import { useNavigate, useLocation } from "react-router-dom";
+import "remixicon/fonts/remixicon.css";
 
 const Home = () => {
+  const { loading, generateReport, reports = [], getReports } = useInterview();
 
-  const { loading, generateReport, reports, getReports } = useInterview()
-  const [jobDescription, setJobDescription] = useState("")
-  const [selfDescription, setSelfDescription] = useState("")
-  const resumeInputRef = useRef()
+  const [jobDescription, setJobDescription] = useState("");
+  const [selfDescription, setSelfDescription] = useState("");
+  const [isLeftShrunk, setIsLeftShrunk] = useState(false);
+  const [title, setTitle] = useState("");
+  const [fileName, setFileName] = useState("");
+  const [isLightMode, setIsLightMode] = useState(false);
 
-  const navigate = useNavigate()
-
-  const handleGenerateReport = async () => {
-    const resumeFile = resumeInputRef.current.files[0]
-
-    const data = await generateReport({
-      jobDescription,
-      selfDescription,
-      resumeFile
-    })
-
-    console.log("FULL RESPONSE:", data)
-
-    if (!data) {
-      console.error("Something is wrong:", data)
-      return
-    }
-
-    navigate(`/interview/${data._id}`)
-  }
+  const resumeInputRef = useRef();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    getReports()
-  }, [])
+    getReports();
+  }, []);
 
-  console.log("REPORTS:", reports)
+  const sortedReports = [...reports].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
 
-  if (loading) {
-    return (
-      <main className='loading-screen'>
-        <h1> Loading your interview plan... </h1>
-      </main>
-    )
+  const handleShare = async () => {
+  const shareData = {
+    title: "SkillSight",
+    text: "Check out this awesome interview prep app!",
+    url: window.location.origin, // your app link
+  };
+
+  try {
+    if (navigator.share) {
+      await navigator.share(shareData);
+    } else {
+      // fallback (desktop)
+      navigator.clipboard.writeText(shareData.url);
+      alert("Link copied to clipboard!");
+    }
+  } catch (err) {
+    console.error("Share failed:", err);
   }
+};
+
+  const handleGenerateReport = async () => {
+    const resumeFile = resumeInputRef.current?.files[0];
+
+    const finalTitle =
+      title.trim() ||
+      jobDescription.trim().slice(0, 30) ||
+      "Untitled Report";
+
+    try {
+      const data = await generateReport({
+        title: finalTitle,
+        jobDescription,
+        selfDescription,
+        resumeFile,
+      });
+
+      if (data?._id) {
+        navigate(`/interview/${data._id}`);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
-    <main className='home-page'>
+    <div className={`app-layout ${isLightMode ? "app-layout--light" : ""}`}>
 
-      {/* ✅ LEFT SIDE - Recent Reports */}
-      {reports?.length > 0 && (
-        <section className='recent-reports'>
-          <h2>My Recent Interview Plans</h2>
-          <ul className='reports-list'>
-            {reports.map(report => (
-              <li
-                key={report._id}
-                className='report-item'
-                onClick={() => navigate(`/interview/${report._id}`)}
-              >
-                <h3>{report.title || 'Untitled Position'}</h3>
-                <p className='report-meta'>
-                  Generated on {new Date(report.createdAt).toLocaleDateString()}
-                </p>
-                <p className={`match-score ${
-                  report.matchScore >= 80
-                    ? 'score--high'
-                    : report.matchScore >= 60
-                    ? 'score--mid'
-                    : 'score--low'
-                }`}>
-                  Match Score: {report.matchScore}%
-                </p>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <main className={`home-page ${isLeftShrunk ? "sidebar-collapsed" : ""}`}>
 
-      {/* ✅ RIGHT SIDE - Main Content */}
-      <div className='main-content'>
-        <header className='chatgpt-header'>
-          <h1>What&apos;s on your mind today?</h1>
-        </header>
+        {/* SIDEBAR */}
+        <aside className="recent-reports">
+          <div className="sidebar-header">
+            {!isLeftShrunk && <h2>Recents</h2>}
 
-        <section className='chatgpt-composer' aria-label='Interview plan form'>
-          <div className='chatgpt-composer__input-shell'>
-            <textarea
-              onChange={(e) => setJobDescription(e.target.value)}
-              className='chatgpt-composer__textarea'
-              name='jobDescription'
-              id='jobDescription'
-              placeholder='Ask anything about your target role, then generate your interview strategy...'
-            />
-            <div className='chatgpt-composer__actions'>
-              <span className='char-counter'>
-                {jobDescription.length} / 5000
-              </span>
-              <button
-                onClick={handleGenerateReport}
-                className='generate-btn'
-                type='button'
-              >
-                Generate
-              </button>
+            <button
+              className="shrink-toggle"
+              onClick={() => setIsLeftShrunk(!isLeftShrunk)}
+            >
+              {isLeftShrunk ? "→" : "☰"}
+            </button>
+          </div>
+
+          {!isLeftShrunk && (
+            <div className="reports-list">
+              {loading ? (
+                <p>Loading...</p>
+              ) : sortedReports.length ? (
+                sortedReports.map((report) => (
+                  <div
+                    key={report._id}
+                    className={`report-item ${
+                      location.pathname === `/interview/${report._id}`
+                        ? "active"
+                        : ""
+                    }`}
+                    onClick={() => navigate(`/interview/${report._id}`)}
+                  >
+                    {report.title || "Untitled"}
+                  </div>
+                ))
+              ) : (
+                <p>No reports</p>
+              )}
             </div>
+          )}
+        </aside>
+
+        {/* MAIN AREA */}
+        <div className="main-content">
+
+          {/* HEADER */}
+          <header className="chatgpt-header">
+            <div className="header-inner">
+
+              <div className="header-left">
+                <h1>SkillSight</h1>
+              </div>
+
+              <div className="header-right">
+                {/* Share Icon */}
+                <i className="ri-share-2-line share-icon" 
+                onClick={handleShare}
+                ></i>
+                <span className="share-text">Share</span>
+
+                {/* Theme Toggle (optional but useful) */}
+                <i
+                  className={`ri-${isLightMode ? "moon-line" : "sun-line"} share-icon`}
+                  onClick={() => setIsLightMode(!isLightMode)}
+                ></i>
+              </div>
+
+            </div>
+          </header>
+
+          {/* CONTENT */}
+          <div className="content-container">
+
+          <div className="title-input">
+             <input
+                value={title}
+               onChange={(e) => setTitle(e.target.value)}
+               placeholder="Enter title for this report (optional)"
+                />
+</div>
+
+            <div className="chat-box">
+              <textarea
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                placeholder="Ask anything about your target role..."
+              />
+            </div>
+
+            <div className="profile-row">
+
+              <textarea
+                value={selfDescription}
+                onChange={(e) => setSelfDescription(e.target.value)}
+                placeholder="Add your experience, skills..."
+              />
+
+              <label htmlFor="resume-upload" className="upload-btn">
+                Resume
+              </label>
+
+              <input
+                id="resume-upload"
+                ref={resumeInputRef}
+                type="file"
+                hidden
+                accept=".pdf"
+                onChange={(e) =>
+                  setFileName(e.target.files[0]?.name || "")
+                }
+              />
+            </div>
+
+            {fileName && <p className="file-name">{fileName}</p>}
+
+            <button
+              onClick={handleGenerateReport}
+              className="generate-btn"
+            >
+              Generate
+            </button>
+
           </div>
+        </div>
+      </main>
+    </div>
+  );
+};
 
-          <div className='profile-row'>
-            <label className='upload-pill' htmlFor='resume'>
-              Upload resume (PDF)
-            </label>
-            <input
-              ref={resumeInputRef}
-              hidden
-              type='file'
-              name='resume'
-              id='resume'
-              accept='.pdf'
-            />
-
-            <textarea
-              onChange={(e) => setSelfDescription(e.target.value)}
-              className='profile-row__textarea'
-              name='selfDescription'
-              id='selfDescription'
-              placeholder='Or add a quick self description (experience, skills, years).'
-            />
-          </div>
-
-          <p className='footer-info'>
-            Add either resume or self description for best results.
-          </p>
-        </section>
-      </div>
-
-    </main>
-  )
-}
-
-export default Home
+export default Home;

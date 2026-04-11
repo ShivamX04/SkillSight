@@ -1,300 +1,318 @@
-import React, { useState , useEffect} from 'react'
-import "../styles/interview.scss"
-import { useInterview } from '../hooks/useinterview.js'
-import { useParams } from 'react-router-dom'
-import Header from '../components/Header.jsx'
+import React, { useState, useEffect } from "react";
+import "../styles/interview.scss";
+import { useInterview } from "../hooks/useinterview.js";
+import { useParams } from "react-router-dom";
+import Header from "../components/Header.jsx";
+import "remixicon/fonts/remixicon.css";
+
+import {
+  Code,
+  User,
+  Map,
+  BarChart3,
+  Download
+} from "lucide-react";
 
 const Interview = () => {
-    const { report , getReportById } = useInterview()
+  const API_URL = import.meta.env.VITE_API_URL;
 
-    const [activeSection, setActiveSection] = useState("technical")
-    const [activeTechnicalIndex, setActiveTechnicalIndex] = useState(0)
-    const [activeBehavioralIndex, setActiveBehavioralIndex] = useState(null)
-    const [isLeftShrunk, setIsLeftShrunk] = useState(false)
-    const [isLightMode, setIsLightMode] = useState(false)
+  const { report, getReportById } = useInterview();
 
-    const { interviewId } = useParams()
+  const [activeSection, setActiveSection] = useState("technical");
+  const [activeTechnicalIndex, setActiveTechnicalIndex] = useState(0);
+  const [activeBehavioralIndex, setActiveBehavioralIndex] = useState(null);
+  const [isLeftShrunk, setIsLeftShrunk] = useState(false);
+  const [isLightMode, setIsLightMode] = useState(false);
 
-    const handleDownload = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:3000/api/interview/resume/pdf/${interviewId}`,
-          {
-            method: "POST",
-            credentials: "include",
-          }
-        )
+  const { interviewId } = useParams();
 
-        const blob = await response.blob()
-        const url = window.URL.createObjectURL(blob)
+  // ✅ SAFE DATA ACCESS
+  const technicalQuestions = report?.technicalQuestions || [];
+  const behavioralQuestions = report?.behavioralQuestions || [];
+  const preparationPlan = report?.preparationPlan || [];
 
-        const a = document.createElement("a")
-        a.href = url
-        a.download = "resume.pdf"
+  // ✅ SHARE FUNCTION (FIXED)
+  const handleShare = async () => {
+    if (!report) return;
 
-        document.body.appendChild(a)
-        a.click()
+    const textContent = `
+📊 Interview Report
 
-        a.remove()
-        window.URL.revokeObjectURL(url)
+🧠 Technical Questions: ${technicalQuestions.length}
+💬 Behavioral Questions: ${behavioralQuestions.length}
+📈 Match Score: ${report.matchScore}%
 
-      } catch (error) {
-        console.error(error)
+🚀 Generated via SkillSight
+`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: "Interview Report - SkillSight",
+          text: textContent,
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(textContent);
+        alert("Report copied to clipboard!");
       }
+    } catch (err) {
+      console.error("Share failed:", err);
     }
+  };
 
-    useEffect(() => {
-      if (interviewId) {
-        getReportById(interviewId)
-      }
-    }, [interviewId])
+  // ✅ DOWNLOAD FUNCTION (ENV READY)
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(
+        `${API_URL}/api/interview/resume/pdf/${interviewId}`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
 
-    if (!report) return <h1>Loading...</h1>
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
 
-    const technicalQuestions = report.technicalQuestions || []
-    const behavioralQuestions = report.behavioralQuestions || []
-    const preparationPlan = report.preparationPlan || []
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "resume.pdf";
 
-    const toggleTechnical = (index) => {
-      setActiveTechnicalIndex(prev => prev === index ? null : index)
+      document.body.appendChild(a);
+      a.click();
+
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
     }
+  };
 
-    const toggleBehavioral = (index) => {
-      setActiveBehavioralIndex(prev => prev === index ? null : index)
+  useEffect(() => {
+    if (interviewId) {
+      getReportById(interviewId);
     }
+  }, [interviewId]);
 
-    return (
-      <div className={`app-layout ${isLightMode ? "app-layout--light" : ""}`}>
+  if (!report) return <p>Loading report...</p>;
 
-        {/* 🔥 LEFT SIDEBAR (FULL HEIGHT) */}
-        <aside className={`interview-layout__left ${isLeftShrunk ? 'shrunk' : ''}`}>
-          
-          <button 
-            className={`shrink-toggle ${isLeftShrunk ? "collapsed" : "expanded"}`}
-            onClick={() => setIsLeftShrunk(!isLeftShrunk)}
-            aria-label={isLeftShrunk ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            <span className="shrink-toggle__icon" aria-hidden="true" />
-          </button>
+  const toggleTechnical = (index) => {
+    setActiveTechnicalIndex((prev) => (prev === index ? null : index));
+  };
 
-          <p className='side-heading'>Sections</p>
+  const toggleBehavioral = (index) => {
+    setActiveBehavioralIndex((prev) => (prev === index ? null : index));
+  };
 
-          <button
-            className={`nav-item ${activeSection === "technical" ? "nav-item--active" : ""}`}
-            data-section="technical"
-            onClick={() => setActiveSection("technical")}
-          >
-            <span className='nav-icon' aria-hidden='true'>
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M4 6h16M4 12h10M4 18h7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-              </svg>
-            </span>
-            <span className='text'>Technical</span>
-          </button>
+  return (
+    <div className={`app-layout ${isLightMode ? "app-layout--light" : ""}`}>
+      
+      {/* 🔥 SIDEBAR */}
+      <aside className={`interview-layout__left ${isLeftShrunk ? "shrunk" : ""}`}>
+        
+        <button
+          className={`shrink-toggle ${isLeftShrunk ? "collapsed" : "expanded"}`}
+          onClick={() => setIsLeftShrunk(!isLeftShrunk)}
+        >
+          ☰
+        </button>
 
-          <button
-            className={`nav-item ${activeSection === "behavioral" ? "nav-item--active" : ""}`}
-            data-section="behavioral"
-            onClick={() => setActiveSection("behavioral")}
-          >
-            <span className='nav-icon' aria-hidden='true'>
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M12 12a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" strokeWidth="1.8" />
-                <path d="M5 19.2c1.6-2.6 3.8-3.8 7-3.8s5.4 1.2 7 3.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-              </svg>
-            </span>
-            <span className='text'>Behavioral</span>
-          </button>
+        <p className="side-heading">Sections</p>
 
-          <button
-            className={`nav-item ${activeSection === "roadmap" ? "nav-item--active" : ""}`}
-            data-section="roadmap"
-            onClick={() => setActiveSection("roadmap")}
-          >
-            <span className='nav-icon' aria-hidden='true'>
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M5 19v-5m7 5V9m7 10V5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-              </svg>
-            </span>
-            <span className='text'>Roadmap</span>
-          </button>
+        <button
+          className={`nav-item ${activeSection === "technical" ? "nav-item--active" : ""}`}
+          onClick={() => setActiveSection("technical")}
+        >
+          <span className="nav-icon"><Code size={18} /></span>
+          <span className="text">Technical</span>
+        </button>
 
-          <button
-            className={`nav-item ${activeSection === "score" ? "nav-item--active" : ""}`}
-            data-section="score"
-            onClick={() => setActiveSection("score")}
-          >
-            <span className='nav-icon' aria-hidden='true'>
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M12 3v18M3 12h18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" opacity="0.35" />
-                <circle cx="12" cy="12" r="6.5" stroke="currentColor" strokeWidth="1.8" />
-              </svg>
-            </span>
-            <span className='text'>Match Score</span>
-          </button>
+        <button
+          className={`nav-item ${activeSection === "behavioral" ? "nav-item--active" : ""}`}
+          onClick={() => setActiveSection("behavioral")}
+        >
+          <span className="nav-icon"><User size={18} /></span>
+          <span className="text">Behavioral</span>
+        </button>
 
-          <button onClick={handleDownload} className='nav-item' data-section="download">
-            <span className='nav-icon' aria-hidden='true'>
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M12 4v10m0 0 4-4m-4 4-4-4M5 19h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </span>
-            <span className='text'>Download Resume</span>
-          </button>
-        </aside>
+        <button
+          className={`nav-item ${activeSection === "roadmap" ? "nav-item--active" : ""}`}
+          onClick={() => setActiveSection("roadmap")}
+        >
+          <span className="nav-icon"><Map size={18} /></span>
+          <span className="text">Roadmap</span>
+        </button>
 
-        {/* 🔥 RIGHT AREA (HEADER + CONTENT) */}
-        <div className="right-area">
+        <button
+          className={`nav-item ${activeSection === "score" ? "nav-item--active" : ""}`}
+          onClick={() => setActiveSection("score")}
+        >
+          <span className="nav-icon"><BarChart3 size={18} /></span>
+          <span className="text">Match Score</span>
+        </button>
 
-          <Header 
-            isLightMode={isLightMode}
-            onToggleTheme={() => setIsLightMode(prev => !prev)}
-          />
+        <button onClick={handleDownload} className="nav-item">
+          <span className="nav-icon"><Download size={18} /></span>
+          <span className="text">Download Resume</span>
+        </button>
+      </aside>
 
-          <main className='interview-page'>
+      {/* 🔥 RIGHT AREA */}
+      <div className="right-area">
 
-            <section className='interview-layout'>
+        <Header
+          isLightMode={isLightMode}
+          onToggleTheme={() => setIsLightMode((prev) => !prev)}
+          onShare={handleShare}
+        />
 
-              {/* 🔥 MAIN CONTENT */}
-              <section className='interview-layout__main'>
+        <main className="interview-page">
+          <section className="interview-layout">
+            <section className="interview-layout__main">
 
-                {activeSection === "technical" && (
-                  <>
-                    <header className='content-header'>
-                      <h1>
-                        Technical Questions 
-                        <span className='question-count'>{technicalQuestions.length}</span>
-                      </h1>
-                    </header>
+              {/* 🔹 TECHNICAL */}
+              {activeSection === "technical" && (
+                <>
+                  <header className="content-header">
+                    <h1>
+                      Technical Questions
+                      <span className="question-count">{technicalQuestions.length}</span>
+                    </h1>
+                  </header>
 
-                    <div className='question-group'>
-                      {technicalQuestions.map((item, index) => (
-                        <article className={`question-card ${activeTechnicalIndex === index ? "question-card--open" : ""}`} key={index}>
-                          <button
-                            className='question-card__toggle'
-                            onClick={() => toggleTechnical(index)}
-                            aria-expanded={activeTechnicalIndex === index}
-                          >
-                            <span className='question-card__number'>{index + 1}</span>
-                            <span className='question-card__question'>{item.question}</span>
-                            <span className='question-card__chevron' aria-hidden='true'>›</span>
-                          </button>
+                  <div className="question-group">
+                    {technicalQuestions.map((item, index) => (
+                      <article
+                        key={index}
+                        className={`question-card ${
+                          activeTechnicalIndex === index ? "question-card--open" : ""
+                        }`}
+                      >
+                        <button
+                          className="question-card__toggle"
+                          onClick={() => toggleTechnical(index)}
+                        >
+                          <span className="question-card__number">{index + 1}</span>
+                          <span className="question-card__question">{item.question}</span>
+                          <span className="question-card__chevron">›</span>
+                        </button>
 
-                          <div className={`question-card__details ${activeTechnicalIndex === index ? "question-card__details--open" : ""}`}>
-                            <div className='question-card__details-inner'>
-                              <p>{item.answer}</p>
-                            </div>
+                        <div
+                          className={`question-card__details ${
+                            activeTechnicalIndex === index ? "question-card__details--open" : ""
+                          }`}
+                        >
+                          <div className="question-card__details-inner">
+                            <p>{item.answer}</p>
                           </div>
-                        </article>
-                      ))}
-                      {technicalQuestions.length === 0 && (
-                        <article className='question-card'>
-                          <p className='question-card__meta'>No technical questions available for this report yet.</p>
-                        </article>
-                      )}
-                    </div>
-                  </>
-                )}
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </>
+              )}
 
-                {activeSection === "behavioral" && (
-                  <>
-                    <header className='content-header'>
-                      <h1>
-                        Behavioral Questions
-                        <span className='question-count'>{behavioralQuestions.length}</span>
-                      </h1>
-                    </header>
+              {/* 🔹 BEHAVIORAL */}
+              {activeSection === "behavioral" && (
+                <>
+                  <header className="content-header">
+                    <h1>
+                      Behavioral Questions
+                      <span className="question-count">{behavioralQuestions.length}</span>
+                    </h1>
+                  </header>
 
-                    <div className='question-group'>
-                      {behavioralQuestions.map((item, index) => (
-                        <article className={`question-card ${activeBehavioralIndex === index ? "question-card--open" : ""}`} key={index}>
-                          <button
-                            className='question-card__toggle'
-                            onClick={() => toggleBehavioral(index)}
-                            aria-expanded={activeBehavioralIndex === index}
-                          >
-                            <span className='question-card__number'>{index + 1}</span>
-                            <span className='question-card__question'>{item.question}</span>
-                            <span className='question-card__chevron' aria-hidden='true'>›</span>
-                          </button>
+                  <div className="question-group">
+                    {behavioralQuestions.map((item, index) => (
+                      <article
+                        key={index}
+                        className={`question-card ${
+                          activeBehavioralIndex === index ? "question-card--open" : ""
+                        }`}
+                      >
+                        <button
+                          className="question-card__toggle"
+                          onClick={() => toggleBehavioral(index)}
+                        >
+                          <span className="question-card__number">{index + 1}</span>
+                          <span className="question-card__question">{item.question}</span>
+                          <span className="question-card__chevron">›</span>
+                        </button>
 
-                          <div className={`question-card__details ${activeBehavioralIndex === index ? "question-card__details--open" : ""}`}>
-                            <div className='question-card__details-inner'>
-                              <p>{item.answer}</p>
-                            </div>
+                        <div
+                          className={`question-card__details ${
+                            activeBehavioralIndex === index ? "question-card__details--open" : ""
+                          }`}
+                        >
+                          <div className="question-card__details-inner">
+                            <p>{item.answer}</p>
                           </div>
-                        </article>
-                      ))}
-                      {behavioralQuestions.length === 0 && (
-                        <article className='question-card'>
-                          <p className='question-card__meta'>No behavioral questions available for this report yet.</p>
-                        </article>
-                      )}
-                    </div>
-                  </>
-                )}
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </>
+              )}
 
-                {activeSection === "roadmap" && (
-                  <>
-                    <header className='content-header'>
-                      <h1>
-                        Preparation Roadmap
-                        <span className='question-count'>{preparationPlan.length}</span>
-                      </h1>
-                    </header>
+              {/* 🔹 ROADMAP */}
+              {activeSection === "roadmap" && (
+                <>
+                  <header className="content-header">
+                    <h1>
+                      Preparation Roadmap
+                      <span className="question-count">{preparationPlan.length}</span>
+                    </h1>
+                  </header>
 
-                    <div className='roadmap-list'>
-                      {preparationPlan.map((item, index) => (
-                        <article className='roadmap-item' key={`${item.day}-${index}`}>
-                          <span className='roadmap-node' />
-                          <div className='roadmap-content'>
-                            <p className='roadmap-day'>Day {item.day}</p>
-                            <p className='roadmap-focus'>
-                              {Array.isArray(item.focus) ? item.focus.join(", ") : item.focus}
-                            </p>
-                            <ul className='roadmap-tasks'>
-                              {(item.task || []).map((task, taskIndex) => (
-                                <li key={`${index}-${taskIndex}`}>{task}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        </article>
-                      ))}
-                      {preparationPlan.length === 0 && (
-                        <article className='question-card'>
-                          <p className='question-card__meta'>No preparation roadmap available for this report yet.</p>
-                        </article>
-                      )}
-                    </div>
-                  </>
-                )}
-
-                {activeSection === "score" && (
-                  <>
-                    <header className='content-header'>
-                      <h1>Match Score</h1>
-                    </header>
-                    <div className='question-group'>
-                      <div className='score-ring' style={{ "--score": report.matchScore }}>
-                        <div className='score-ring__inner'>
-                          <span className='score-ring__value'>{report.matchScore}%</span>
+                  <div className="roadmap-list">
+                    {preparationPlan.map((item, index) => (
+                      <div key={index} className="roadmap-item">
+                        <span className="roadmap-node" />
+                        <div>
+                          <p className="roadmap-day">Day {item.day}</p>
+                          <p className="roadmap-focus">{item.focus}</p>
                         </div>
                       </div>
-                      <p className='score-note'>
-                        Your resume/profile currently matches this role at {report.matchScore}%.
-                      </p>
-                    </div>
-                  </>
-                )}
+                    ))}
+                  </div>
+                </>
+              )}
 
-              </section>
+              {/* 🔹 SCORE */}
+              {activeSection === "score" && (
+                <>
+                  <header className="content-header">
+                    <h1>Match Score</h1>
+                  </header>
+
+                  <div className="question-group">
+                    <p className="score-title">Your Match Score</p>
+
+                    <div
+                      className="score-ring"
+                      style={{ "--score": report.matchScore }}
+                    >
+                      <div className="score-ring__inner">
+                        <span className="score-ring__value">
+                          {report.matchScore}%
+                        </span>
+                      </div>
+                    </div>
+
+                    <p className="score-note">
+                      Your resume/profile matches this role at {report.matchScore}%.
+                    </p>
+                  </div>
+                </>
+              )}
 
             </section>
-          </main>
-
-        </div>
+          </section>
+        </main>
       </div>
-    )
-}
+    </div>
+  );
+};
 
-export default Interview
+export default Interview;

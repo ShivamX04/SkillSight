@@ -1,22 +1,36 @@
 const express = require('express');
-const cookieParser = require('cookie-parser')
-const cors = require('cors')
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:5173' // fallback for safety
+].filter(Boolean);
+
 app.use(cors({
-    origin: 'http://localhost:5173',
-    credentials: true
-}))
+  origin: function (origin, callback) {
+    // allow requests with no origin (like Postman)
+    if (!origin) return callback(null, true);
 
-/* require all the routes here */
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
+}));
+
+/* routes */
 const authRouter = require('./routes/auth.routes');
-const interviewRouter = require('./routes/interview.routes')
+const interviewRouter = require('./routes/interview.routes');
 
-/* using all the routes here */
 app.use('/api/auth', authRouter);
-app.use("/api/interview", interviewRouter)
+app.use('/api/interview', interviewRouter);
 
 module.exports = app;
