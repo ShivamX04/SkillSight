@@ -71,7 +71,6 @@ const Login = () => {
         </p>
 
       </form>
-
     </main>
   )
 }
