@@ -34,6 +34,9 @@ const handleLogin = async ({ email, password }) => {
         setloading(true)
         try{
         const data = await register({username,email, password})
+
+         await register({ username, email, password });
+
          setuser(data.user)
         }catch(err){
 
