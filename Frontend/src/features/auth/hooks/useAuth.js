@@ -8,27 +8,27 @@ export const useAuth = () =>{
     const context = useContext(AuthContext)
     const {user, setuser, loading, setloading} = context
 
-    const handleLogin = async ({email, password}) =>{
-        setloading(true)
+const handleLogin = async ({ email, password }) => {
+  setloading(true);
 
-    try{
-        const data = await login({email, password})
+  try {
+    const data = await login({ email, password });
 
-    if(data?.user){
-        setuser(data.user)
-        localStorage.setItem("user", JSON.stringify(data.user))
+    if (data?.user && data?.token) {
+      setuser(data.user);
+
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("token", data.token); // ✅ IMPORTANT
     }
 
-    return data
-    } 
-    catch(err){
-    console.log(err)
-    return null
-    } 
-    finally{
-    setloading(false)
+    return data;
+  } catch (err) {
+    console.log("Login err: ",err.response?.data || err);
+    return null;
+  } finally {
+    setloading(false);
   }
-}
+};
 
     const handleRegister = async ({username, email, password}) =>{
         setloading(true)
@@ -54,20 +54,27 @@ export const useAuth = () =>{
         }
     }
 
-    useEffect(() =>{
+   useEffect(() => {
+    const token = localStorage.getItem("token");
 
-        const getAndSetUser = async () =>  {
-            try {
-                // gets data of user from getMe //
-                const data = await getMe()
-                setuser(data.user)
-            }  catch (err) { } finally{
-                setloading(false)
-        }
-        }
+    if (!token) {
+      setloading(false);
+    return;
+    }
 
-        getAndSetUser()
-    }, [])
+  const getAndSetUser = async () => {
+    try {
+      const data = await getMe();
+      setuser(data.user);
+    } catch (err) {
+      console.log("GetMe failed:", err.response?.data);
+    } finally {
+      setloading(false);
+    }
+  };
+
+  getAndSetUser();
+}, []);
 
     return { user, loading, handleRegister, handleLogin, handlelogout }
 }

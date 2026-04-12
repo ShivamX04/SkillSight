@@ -49,6 +49,7 @@ export async function logout() {
 
 // ✅ GET CURRENT USER
 export async function getMe() {
+  const token = localStorage.getItem("token");
   try {
     const response = await api.get("/api/auth/get-me");
     return response.data;
