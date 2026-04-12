@@ -31,13 +31,13 @@ const handleLogin = async ({ email, password }) => {
 };
 
     const handleRegister = async ({username, email, password}) =>{
+        console.log("HANDLE REGISTER FIRED:");
         setloading(true)
         try{
         const data = await register({username,email, password})
 
-         await register({ username, email, password });
-
-         setuser(data.user)
+         console.log("REGISTER DATA:", { username, email, password });
+          setuser(data.user)
         }catch(err){
 
         } finally{

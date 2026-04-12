@@ -13,6 +13,7 @@ const Register = () => {
 
   const handleSubmit = async (e) =>{
     e.preventDefault()
+    console.log("SUBMIT FIRED");
     const data = await handleRegister({username,email,password})
     console.log(data)
     navigate('/')

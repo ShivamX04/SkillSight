@@ -18,9 +18,15 @@ if(!username || !email || !password){
     })
 }
 
+const normalizedEmail = email.toLowerCase().trim();
+const normalizedUsername = username.toLowerCase().trim();
+
 const isUserAlreadyExist = await userModel.findOne({
-    $or: [ { username}, {email} ]
-})
+  $or: [
+    { email: normalizedEmail },
+    { username: normalizedUsername }
+  ]
+});
 
 if(isUserAlreadyExist){
     return res.status(409).json({
@@ -31,8 +37,8 @@ if(isUserAlreadyExist){
 const hash = await bcrypt.hash(password,10);
 
 const user = await userModel.create({
-    username,
-    email,
+    username: normalizedUsername,
+    email: normalizedEmail,
     password: hash
 })
 
