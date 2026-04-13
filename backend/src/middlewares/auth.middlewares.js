@@ -4,7 +4,6 @@ const tokenBlacklistModel = require('../models/blackList.model')
 
 async function authUser(req, res, next) {
 
-    
 console.log("🔥 MIDDLEWARE HIT");
 console.log("JWT_SECRET:", process.env.JWT_SECRET);
 console.log("AUTH HEADER:", req.headers.authorization)

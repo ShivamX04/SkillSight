@@ -2,74 +2,63 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+// ✅ Clean axios instance
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true,
 });
 
+// ✅ 🔥 INTERCEPTOR (AUTO ADD TOKEN)
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
 
-/***
- * @description service to generate interview report based on user self description,
- * resume and job description.
- */
+  console.log("🔥 INTERCEPTOR TOKEN:", token); // debug
 
-export const generateInterviewReport = async({ jobDescription, selfDescription, resumeFile })=>{
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
 
-    const formData = new FormData()
-    formData.append("jobDescription", jobDescription)
-    formData.append("selfDescription", selfDescription)
-    formData.append("resume", resumeFile)
+  return config;
+});
 
-    const response = await api.post("/api/interview", formData)
+// ================== APIs ================== //
 
-    return response.data
-}
+export const generateInterviewReport = async ({
+  jobDescription,
+  selfDescription,
+  resumeFile,
+}) => {
+  const formData = new FormData();
+  formData.append("jobDescription", jobDescription);
+  formData.append("selfDescription", selfDescription);
+  formData.append("resume", resumeFile);
 
-/***
- * @description Service to get interview report by interviewId.
- */
+  const response = await api.post("/api/interview", formData);
 
-export const getInterviewReportById = async (interviewId) =>{
+  return response.data;
+};
 
-    const response = await api.get(`/api/interview/report/${interviewId}`)
+export const getInterviewReportById = async (interviewId) => {
+  const response = await api.get(
+    `/api/interview/report/${interviewId}`
+  );
 
-    return response.data
-}
+  return response.data;
+};
 
-/**
- * @description Service to get interview report of logged in user.
- */
+export const getAllInterviewReports = async () => {
+  const response = await api.get("/api/interview");
 
-export const getAllInterviewReports = async () =>{
-    const response = await api.get("/api/interview/")
- 
-    return response.data
-}
+  return response.data;
+};
 
-/**
- * @description Service to generate resume pdf based on user self description , resume content and job description
- */
-
-/**
- * @description Service to generate resume pdf based on user self description , resume content and job description
- */
-
+// ✅ FIXED (GET + blob)
 export const generateResumePdf = async (interviewReportId) => {
-    try {
-        console.log("FRONTEND ID: ", interviewReportId)
-
-        const response = await api.post(
-            `/api/interview/resume/pdf/${interviewReportId}`,
-            null,
-            {
-                responseType: "blob"
-            }
-        )
-
-        return response.data
-
-    } catch (error) {
-        console.log("FRONTEND ERROR: ", error.response?.data || error.message)
-        throw error
+  const response = await api.get(
+    `/api/interview/resume/pdf/${interviewReportId}`,
+    {
+      responseType: "blob",
     }
-}
+  );
+
+  return response.data;
+};
