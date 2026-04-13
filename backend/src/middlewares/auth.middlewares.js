@@ -1,6 +1,11 @@
 const jwt = require('jsonwebtoken')
 const tokenBlacklistModel = require('../models/blackList.model')
 
+
+console.log("🔥 MIDDLEWARE HIT");
+console.log("JWT_SECRET:", process.env.JWT_SECRET);
+console.log("AUTH HEADER:", req.headers.authorization);
+
 async function authUser(req, res, next) {
   let token;
 
