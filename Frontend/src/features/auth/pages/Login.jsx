@@ -13,15 +13,17 @@ const Login = () => {
   const [email, setemail] = useState('')
   const [password, setpassword] = useState('')
 
-
   const handleSubmit = async (e) => {
-    e.preventDefault()
+  e.preventDefault();
 
-  /*  const data = await handleLogin({ email, password })
-    console.log(data) */
-    await handleLogin({email, password})
-    navigate('/')
-  }
+  console.log("🔥 FORM SUBMITTED");
+
+  const data = await handleLogin({ email, password });
+
+  console.log("🔥 LOGIN RESULT:", data);
+
+  navigate("/");
+};
 
   if (loading) {
     return (
