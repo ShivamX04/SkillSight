@@ -13,6 +13,8 @@ const Login = () => {
   const [email, setemail] = useState('')
   const [password, setpassword] = useState('')
 
+  console.log("LOGIN RESPONSE:", response.data);
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
