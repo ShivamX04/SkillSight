@@ -4,9 +4,24 @@ const cors = require('cors');
 
 const app = express();
 
-// ✅ CORS FIRST (VERY IMPORTANT)
+// ✅ FIXED CORS (supports all Vercel deployments)
 app.use(cors({
-  origin: "https://skill-sight-eight.vercel.app",
+  origin: function (origin, callback) {
+    // allow requests with no origin (Postman, mobile apps)
+    if (!origin) return callback(null, true);
+
+    // allow all Vercel domains
+    if (origin.includes("vercel.app")) {
+      return callback(null, true);
+    }
+
+    // allow localhost (for development)
+    if (origin.includes("localhost")) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Not allowed by CORS"));
+  },
   credentials: true
 }));
 
@@ -14,14 +29,13 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ Test route
+// ✅ Test routes
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
 
-// 🔥 ADD THIS BELOW
 app.get("/test", (req, res) => {
-  res.send("NEW BUILD WORKING");
+  res.send("NEW BUILD WORKING ✅");
 });
 
 /* routes */
