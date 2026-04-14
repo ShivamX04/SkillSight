@@ -4,7 +4,7 @@ import './style.scss'
 
 // ✅ import RouterProvider
 import { RouterProvider } from "react-router-dom"
-import { router } from "./router" // your file
+import { router } from "./app.router.jsx" // your file
 
 import { AuthProvider } from './features/auth/auth.context.jsx'
 
