@@ -2,15 +2,17 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.scss'
 import App from './App.jsx'
-import { AuthProvider } from '.features/auth/auth.context.jsx' // ✅ import
+import { BrowserRouter } from 'react-router-dom'
 
-console.log("AuthProvider:", AuthProvider);
+// ✅ IMPORTANT: correct path to your context
+import { AuthProvider } from './features/auth/auth.context.jsx'
 
 createRoot(document.getElementById('root')).render(
-
   <StrictMode>
-    <AuthProvider>   {/* ✅ WRAP HERE */}
-      <App />
+    <AuthProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </AuthProvider>
   </StrictMode>
 )
