@@ -16,11 +16,10 @@ const handleLogin = async ({ email, password }) => {
     const data = await login({ email, password });
 
     console.log("LOGIN RESPONSE:", data);
-    if (data?.user && data?.token) {
+    if (data?.user) {
       setuser(data.user);
 
       localStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem("token", data.token); // ✅ IMPORTANT
     }
 
     return data;
