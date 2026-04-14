@@ -9,12 +9,13 @@ export const useAuth = () =>{
     const {user, setuser, loading, setloading} = context
 
 const handleLogin = async ({ email, password }) => {
-  console.log("LOGIN RESPONSE:", response.data);
+   
   setloading(true);
 
   try {
     const data = await login({ email, password });
 
+    console.log("LOGIN RESPONSE:", data);
     if (data?.user && data?.token) {
       setuser(data.user);
 
