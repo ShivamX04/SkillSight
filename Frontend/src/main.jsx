@@ -11,7 +11,9 @@ import { AuthProvider } from './features/auth/auth.context.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
+        <InterviewProvider>
       <RouterProvider router={router} />  {/* ✅ THIS replaces BrowserRouter */}
+      </InterviewProvider>
     </AuthProvider>
   </StrictMode>
 )
