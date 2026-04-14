@@ -4,9 +4,10 @@ import './style.scss'
 import App from './App.jsx'
 import { AuthProvider } from '.features/auth/auth.context.jsx' // ✅ import
 
+console.log("AuthProvider:", AuthProvider);
+
 createRoot(document.getElementById('root')).render(
 
-    console.log("AuthProvider:", AuthProvider);
   <StrictMode>
     <AuthProvider>   {/* ✅ WRAP HERE */}
       <App />
