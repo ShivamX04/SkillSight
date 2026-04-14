@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.scss'
+import { InterviewProvider } from './features/interview/interview.context.jsx'
 
 // ✅ import RouterProvider
 import { RouterProvider } from "react-router-dom"
