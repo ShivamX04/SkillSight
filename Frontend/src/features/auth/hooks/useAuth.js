@@ -59,11 +59,10 @@ const handleLogin = async ({ email, password }) => {
     }
 
    useEffect(() => {
-    const token = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
 
-    if (!token) {
-      setloading(false);
-    return;
+    if (storedUser) {
+      setuser(JSON.parse(storedUser));
     }
 
   const getAndSetUser = async () => {
@@ -80,5 +79,4 @@ const handleLogin = async ({ email, password }) => {
   getAndSetUser();
 }, []);
 
-    return { user, loading, handleRegister, handleLogin, handlelogout }
 }
