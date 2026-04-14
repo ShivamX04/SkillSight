@@ -1,101 +1,116 @@
-import {getAllInterviewReports, generateInterviewReport,getInterviewReportById, generateResumePdf} from "../services/interview.api"
-import { useContext , useEffect} from "react"
-import { InterviewContext } from '../interview.context'
-import { useParams } from "react-router"
+import {
+  getAllInterviewReports,
+  generateInterviewReport,
+  getInterviewReportById,
+  generateResumePdf
+} from "../services/interview.api";
 
+import { useContext } from "react";
+import { InterviewContext } from "../interview.context";
 
-export const useInterview = () =>{
-    
-    // taking out our interviewContext //
-    const context = useContext(InterviewContext)
+export const useInterview = () => {
 
-    if(!context){
-        throw new Error("useInterview must be used within an  InterviewProvider")
-    }
+  const context = useContext(InterviewContext);
 
-    const {loading, setloading, report, setreport, reports, setreports} = context
+  if (!context) {
+    throw new Error("useInterview must be used within an InterviewProvider");
+  }
 
-     const { interviewId } = useParams();
+  const {
+    loading,
+    setloading,
+    report,
+    setreport,
+    reports,
+    setreports
+  } = context;
 
-     useEffect(() => {
-        if (interviewId) {
-            getReportById(interviewId)
-        } else {
-            getReports()
-        }
-    }, [interviewId])
-
-    const generateReport = async({ jobDescription, selfDescription, resumeFile}) =>{
-        setloading(true)
-        try{
-            const response = await generateInterviewReport({ jobDescription, selfDescription,resumeFile})
-
-            console.log("Full RESPONSE:", response)
-
-            setreport(response.interviewReport)
-
-            console.log("RETURING:", response.interviewReport)
-
-            return response.interviewReport
-
-        } catch(error){
-            
-          console.log(error)
-        } finally{
-            setloading(false)
-        }
-    }
-
-    const getReportById = async (interviewId) => {
-        setloading(true)
-        let response = null
+  // ✅ Generate report
+  const generateReport = async ({ jobDescription, selfDescription, resumeFile }) => {
+    setloading(true);
 
     try {
-        response = await getInterviewReportById(interviewId)
-        
-        setreport(response.interviewReport)
-    
-  } catch (error) {
-    console.log(error)
-  } finally {
-    setloading(false)
-  }
-  return response.interviewReport
-}
+      const response = await generateInterviewReport({
+        jobDescription,
+        selfDescription,
+        resumeFile
+      });
 
-    const getReports = async() =>{
-        setloading(true)
-        try{
-            const response = await getAllInterviewReports()
-            setreports(response.interviewReports)
-        } catch(error){
-            console.log(error)
-        } finally{
-            setloading(false)
-        }
+      setreport(response.interviewReport);
+      return response.interviewReport;
+
+    } catch (error) {
+      console.log(error);
+      return null;
+    } finally {
+      setloading(false);
     }
+  };
 
-    const getResumePdf = async (interviewReportId) =>{
-        setloading(true)
-        let response = null
+  // ✅ Get single report
+  const getReportById = async (interviewId) => {
+    setloading(true);
 
-        try{
-            response = await generateResumePdf({ interviewReportId})
-            const url = window.URL.createObjectURL(new Blob([response], {type: "application/pdf"}))
-            const link = document.createElement("a")
-            link.href = url
-            link.setAttribute("download", `resume_${interviewReportId}.pdf`)
-            document.body.appendChild(link)
-            link.click()
-        }
-        catch(error){
-            console.log(error)
-        } finally{
-            setloading(false)
-        }
+    try {
+      const response = await getInterviewReportById(interviewId);
+      setreport(response.interviewReport);
+      return response.interviewReport;
 
+    } catch (error) {
+      console.log(error);
+      return null;
+    } finally {
+      setloading(false);
     }
+  };
 
-    return {loading, report, reports, generateReport, getReportById, getReports, getResumePdf}
-}
+  // ✅ Get all reports
+  const getReports = async () => {
+    setloading(true);
 
+    try {
+      const response = await getAllInterviewReports();
+      setreports(response.interviewReports);
+
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setloading(false);
+    }
+  };
+
+  // ✅ Download PDF
+  const getResumePdf = async (interviewReportId) => {
+    setloading(true);
+
+    try {
+      const response = await generateResumePdf({ interviewReportId });
+
+      const url = window.URL.createObjectURL(
+        new Blob([response], { type: "application/pdf" })
+      );
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `resume_${interviewReportId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setloading(false);
+    }
+  };
+
+  // ✅ RETURN (IMPORTANT)
+  return {
+    loading,
+    report,
+    reports,
+    generateReport,
+    getReportById,
+    getReports,
+    getResumePdf
+  };
+};
