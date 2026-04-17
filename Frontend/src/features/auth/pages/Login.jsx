@@ -6,24 +6,27 @@ import { useAuth } from '../hooks/useAuth'
 
 const Login = () => {
 
-  const { loading, handleLogin, user } = useAuth()
-  const navigate = useNavigate()
+  const { loading, handleLogin, user } = useAuth();
+  const navigate = useNavigate();
 
-  // two way binding
-  const [email, setemail] = useState('')
-  const [password, setpassword] = useState('')
+  const [email, setemail] = useState('');
+  const [password, setpassword] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user]);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const data = await handleLogin({ email, password });
+    const data = await handleLogin({ email, password });
 
-  if (data?.user) {
-    navigate("/");
-  } else {
-    alert("Login failed");
-  }
-};
+    if (!data?.user) {
+      alert("Login failed");
+    }
+  };
 
   if (loading) {
     return (
