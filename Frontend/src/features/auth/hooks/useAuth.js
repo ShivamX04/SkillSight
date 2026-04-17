@@ -19,12 +19,15 @@ export const useAuth = () => {
 
       console.log("LOGIN RESPONSE:", data);
 
-      if (data?.user && data?.token) {
+      // ✅ FIX: only check user (NO token)
+      if (data?.user) {
         setuser(data.user);
 
-        // ✅ store both
+        // optional: store user for fast reload
         localStorage.setItem("user", JSON.stringify(data.user));
-        localStorage.setItem("token", data.token);
+
+        // 🔥 redirect after login
+        window.location.href = "/home";
       }
 
       return data;
@@ -42,10 +45,12 @@ export const useAuth = () => {
     try {
       const data = await register({ username, email, password });
 
-      if (data?.user && data?.token) {
+      // ✅ FIX: only check user
+      if (data?.user) {
         setuser(data.user);
         localStorage.setItem("user", JSON.stringify(data.user));
-        localStorage.setItem("token", data.token);
+
+        window.location.href = "/home";
       }
     } catch (err) {
       console.log(err);
@@ -62,9 +67,10 @@ export const useAuth = () => {
 
       setuser(null);
 
-      // ✅ clear everything
+      // ✅ clear stored user
       localStorage.removeItem("user");
-      localStorage.removeItem("token");
+
+      window.location.href = "/login";
     } catch (err) {
       console.log(err);
     } finally {
@@ -76,25 +82,11 @@ export const useAuth = () => {
   useEffect(() => {
     const getAndSetUser = async () => {
       try {
-        const token = localStorage.getItem("token");
-
-        // ❌ No token → no user
-        if (!token) {
-          setuser(null);
-          return;
-        }
-
-        const data = await getMe();
+        const data = await getMe(); // cookie-based auth
         setuser(data.user);
-
       } catch (err) {
         console.log("GetMe failed:", err.response?.data);
-
-        // ❌ invalid token → clear everything
         setuser(null);
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-
       } finally {
         setloading(false);
       }
