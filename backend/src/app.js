@@ -4,9 +4,19 @@ const cors = require('cors');
 
 const app = express();
 
-// ✅ FIXED CORS (STRICT + COOKIE SUPPORT)
+const allowedOrigins = [
+  "https://skill-sight-eight.vercel.app",
+  "https://skill-sight-lv8dac1h9-shivamx04s-projects.vercel.app"
+];
+
 app.use(cors({
-  origin: "https://skill-sight-eight.vercel.app", // 🔥 your frontend URL
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
 
