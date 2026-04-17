@@ -4,28 +4,13 @@ const cors = require('cors');
 
 const app = express();
 
-// ✅ FIXED CORS (supports all Vercel deployments)
+// ✅ FIXED CORS (STRICT + COOKIE SUPPORT)
 app.use(cors({
-  origin: function (origin, callback) {
-    // allow requests with no origin (Postman, mobile apps)
-    if (!origin) return callback(null, true);
-
-    // allow all Vercel domains
-    if (origin.includes("vercel.app")) {
-      return callback(null, true);
-    }
-
-    // allow localhost (for development)
-    if (origin.includes("localhost")) {
-      return callback(null, true);
-    }
-
-    return callback(new Error("Not allowed by CORS"));
-  },
+  origin: "https://skill-sight-eight.vercel.app", // 🔥 your frontend URL
   credentials: true
 }));
 
-// ✅ Other middlewares
+// ✅ Middlewares
 app.use(express.json());
 app.use(cookieParser());
 
