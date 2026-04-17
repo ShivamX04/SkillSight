@@ -16,16 +16,12 @@ const Login = () => {
   const handleSubmit = async (e) => {
   e.preventDefault();
 
-  console.log("🔥 FORM SUBMITTED");
-
   const data = await handleLogin({ email, password });
 
-  console.log("🔥 LOGIN RESULT:", data);
-
-  if (data?.success) {
+  if (data?.user) {
     navigate("/");
   } else {
-    alert("Invalid credentials");
+    alert("Login failed");
   }
 };
 
