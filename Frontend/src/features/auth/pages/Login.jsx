@@ -22,7 +22,11 @@ const Login = () => {
 
   console.log("🔥 LOGIN RESULT:", data);
 
-  navigate("/");
+  if (data?.success) {
+    navigate("/");
+  } else {
+    alert("Invalid credentials");
+  }
 };
 
   if (loading) {

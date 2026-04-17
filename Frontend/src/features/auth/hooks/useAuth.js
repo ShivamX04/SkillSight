@@ -11,33 +11,26 @@ export const useAuth = () => {
 
   const { user, setuser, loading, setloading } = context;
 
-  // 🔐 LOGIN
   const handleLogin = async ({ email, password }) => {
     setloading(true);
     try {
-      const data = await login({ email, password });
+    const data = await login({ email, password });
 
-      console.log("LOGIN RESPONSE:", data);
+    console.log("LOGIN RESPONSE:", data);
 
-      // ✅ FIX: only check user (NO token)
-      if (data?.user) {
-        setuser(data.user);
-
-        // optional: store user for fast reload
-        localStorage.setItem("user", JSON.stringify(data.user));
-
-        // 🔥 redirect after login
-        window.location.href = "/home";
-      }
-
-      return data;
-    } catch (err) {
-      console.log("Login err:", err.response?.data || err);
-      return null;
-    } finally {
-      setloading(false);
+    if (data?.user) {
+      setuser(data.user);
+      localStorage.setItem("user", JSON.stringify(data.user));
     }
-  };
+
+    return data;
+  } catch (err) {
+    console.log("Login err:", err.response?.data || err);
+    return null;
+  } finally {
+    setloading(false);
+  }
+};
 
   // 📝 REGISTER
   const handleRegister = async ({ username, email, password }) => {
