@@ -8,6 +8,7 @@ const Protected = ({ children }) => {
  /* const { user, loading } = useContext(AuthContext); */
     const {loading, user} = useAuth()
 
+    console.log("PROTECTED STATE:", { user, loading });
   if (loading) {
     return (<main><h1>Loading...</h1></main>)
   }

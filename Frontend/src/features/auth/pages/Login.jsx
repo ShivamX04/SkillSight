@@ -9,6 +9,8 @@ const Login = () => {
   const { loading, handleLogin, user } = useAuth();
   const navigate = useNavigate();
 
+  console.log("LOGIN PAGE STATE:", { user, loading });
+
   const [email, setemail] = useState('');
   const [password, setpassword] = useState('');
 
