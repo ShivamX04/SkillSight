@@ -21,12 +21,12 @@ export const useAuth = () => {
 
       if (data?.user) {
         setuser(data.user);
-        navigate("/home"); // ✅ proper navigation
+        navigate("/home"); // ✅ redirect after login
       }
 
       return data;
     } catch (err) {
-      console.log("Login err:", err.response?.data || err);
+      console.log("Login error:", err.response?.data || err);
       return null;
     } finally {
       setloading(false);
@@ -41,7 +41,7 @@ export const useAuth = () => {
 
       if (data?.user) {
         setuser(data.user);
-        navigate("/home"); // ✅ fixed
+        navigate("/home");
       }
     } catch (err) {
       console.log(err);
@@ -56,7 +56,7 @@ export const useAuth = () => {
     try {
       await logout();
       setuser(null);
-      navigate("/login"); // ✅ fixed
+      navigate("/login");
     } catch (err) {
       console.log(err);
     } finally {
@@ -79,7 +79,7 @@ export const useAuth = () => {
         console.log("GetMe failed:", err.response?.data);
         setuser(null);
       } finally {
-        setloading(false);
+        setloading(false); // ✅ ONLY place where loading ends
       }
     };
 
