@@ -6,12 +6,16 @@ const app = express();
 
 const allowedOrigins = [
   "https://skill-sight-eight.vercel.app",
-  "https://skill-sight-lv8dac1h9-shivamx04s-projects.vercel.app"
+  "https://skill-sight-lv8dac1h9-shivamx04s-projects.vercel.app",
+  "https://skill-sight-ajvsn5knk-shivamx04s-projects.vercel.app" // ✅ ADD THIS
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (
+      !origin || 
+      origin.includes("vercel.app") // ✅ allow all Vercel previews
+    ) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
