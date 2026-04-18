@@ -31,12 +31,8 @@ const Login = () => {
   };
 
   if (loading) {
-    return (
-      <main>
-        <h1>loading....</h1>
-      </main>
-    )
-  }
+  return null; // 🔥 prevents flicker
+}
 
   return (
     <main>

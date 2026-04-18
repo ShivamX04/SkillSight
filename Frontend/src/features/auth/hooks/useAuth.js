@@ -19,9 +19,9 @@ export const useAuth = () => {
     try {
       const data = await login({ email, password });
 
-      if (data?.user) {
+      if (data && data.user && data.user.id) {
         setuser(data.user);
-        navigate("/home"); // ✅ redirect after login
+        navigate("/home");
       }
 
       return data;
@@ -39,7 +39,7 @@ export const useAuth = () => {
     try {
       const data = await register({ username, email, password });
 
-      if (data?.user) {
+      if (data && data.user && data.user.id) {
         setuser(data.user);
         navigate("/home");
       }
@@ -70,16 +70,20 @@ export const useAuth = () => {
       try {
         const data = await getMe();
 
-        if (data?.user) {
+        console.log("GETME RESPONSE:", data); // 🔍 DEBUG
+
+        // ✅ STRICT CHECK
+        if (data && data.user && data.user.id) {
           setuser(data.user);
         } else {
           setuser(null);
         }
+
       } catch (err) {
         console.log("GetMe failed:", err.response?.data);
         setuser(null);
       } finally {
-        setloading(false); // ✅ ONLY place where loading ends
+        setloading(false);
       }
     };
 
