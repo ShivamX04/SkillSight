@@ -1,9 +1,11 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../auth.context";
-import { login, register, logout, getMe } from '../services/auth.api';
+import { login, register, logout, getMe } from "../services/auth.api";
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
+  const navigate = useNavigate();
 
   if (!context) {
     throw new Error("useAuth must be used within AuthProvider");
@@ -11,26 +13,25 @@ export const useAuth = () => {
 
   const { user, setuser, loading, setloading } = context;
 
+  // 🔐 LOGIN
   const handleLogin = async ({ email, password }) => {
     setloading(true);
     try {
-    const data = await login({ email, password });
+      const data = await login({ email, password });
 
-    console.log("LOGIN RESPONSE:", data);
+      if (data?.user) {
+        setuser(data.user);
+        navigate("/home"); // ✅ proper navigation
+      }
 
-    if (data?.user) {
-      setuser(data.user);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      return data;
+    } catch (err) {
+      console.log("Login err:", err.response?.data || err);
+      return null;
+    } finally {
+      setloading(false);
     }
-
-    return data;
-  } catch (err) {
-    console.log("Login err:", err.response?.data || err);
-    return null;
-  } finally {
-    setloading(false);
-  }
-};
+  };
 
   // 📝 REGISTER
   const handleRegister = async ({ username, email, password }) => {
@@ -38,12 +39,9 @@ export const useAuth = () => {
     try {
       const data = await register({ username, email, password });
 
-      // ✅ FIX: only check user
       if (data?.user) {
         setuser(data.user);
-        localStorage.setItem("user", JSON.stringify(data.user));
-
-        window.location.href = "/home";
+        navigate("/home"); // ✅ fixed
       }
     } catch (err) {
       console.log(err);
@@ -57,13 +55,8 @@ export const useAuth = () => {
     setloading(true);
     try {
       await logout();
-
       setuser(null);
-
-      // ✅ clear stored user
-      localStorage.removeItem("user");
-
-      window.location.href = "/login";
+      navigate("/login"); // ✅ fixed
     } catch (err) {
       console.log(err);
     } finally {
@@ -75,8 +68,13 @@ export const useAuth = () => {
   useEffect(() => {
     const getAndSetUser = async () => {
       try {
-        const data = await getMe(); // cookie-based auth
-        setuser(data.user);
+        const data = await getMe();
+
+        if (data?.user) {
+          setuser(data.user);
+        } else {
+          setuser(null);
+        }
       } catch (err) {
         console.log("GetMe failed:", err.response?.data);
         setuser(null);
@@ -93,6 +91,6 @@ export const useAuth = () => {
     loading,
     handleLogin,
     handleRegister,
-    handlelogout
+    handlelogout,
   };
 };

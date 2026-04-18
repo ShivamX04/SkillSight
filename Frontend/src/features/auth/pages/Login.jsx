@@ -12,11 +12,11 @@ const Login = () => {
   const [email, setemail] = useState('');
   const [password, setpassword] = useState('');
 
-  useEffect(() => {
-    if (user) {
-      navigate("/");
-    }
-  }, [user]);
+   useEffect(() => {
+  if (!loading && user) {
+    navigate("/home"); // ✅ go directly to home
+  }
+}, [user, loading]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
