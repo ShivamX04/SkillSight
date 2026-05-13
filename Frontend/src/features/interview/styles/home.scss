@@ -200,14 +200,17 @@ html, body, #root {
   display: flex;
   justify-content: center;
   align-items: center;
+  border: 2px solid red;
+  min-height: 100px;
 }
 
 .logout-btn {
-  padding: 10px 22px;
+  padding: 12px 20px;
   border: none;
-  border-radius: 10px;
+  border-radius: 0px;
   background: #ff4d4f;
   color: white;
+  display: block;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
