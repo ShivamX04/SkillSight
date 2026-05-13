@@ -196,6 +196,33 @@ html, body, #root {
   color: white;
 }
 
+.header-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logout-btn {
+  padding: 10px 22px;
+  border: none;
+  border-radius: 10px;
+  background: #ff4d4f;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: #e63946;
+  transform: translateY(-2px);
+}
+
+.logout-btn:active {
+  transform: scale(0.97);
+}
+
 .app-layout--light .share-icon {
   color: #374151;
 }
