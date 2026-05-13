@@ -26,6 +26,22 @@ const Home = () => {
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
 
+   const handleLogout = async () => {
+    try {
+      await axios.post(
+        "https://skillsight-b36b.onrender.com/api/auth/logout",
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+
+      navigate("/login");
+    } catch (error) {
+      console.log("Logout error:", error);
+    }
+  };
+
   const handleShare = async () => {
   const shareData = {
     title: "SkillSight",
@@ -122,6 +138,12 @@ const Home = () => {
 
               <div className="header-left">
                 <h1>SkillSight</h1>
+              </div>
+
+              <div className="header-center">
+                <button onClick={handleLogout} className="logout-btn">
+                  Logout
+                </button>
               </div>
 
               <div className="header-right">
