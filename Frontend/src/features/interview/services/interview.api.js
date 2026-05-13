@@ -10,13 +10,9 @@ const api = axios.create({
 // ✅ 🔥 INTERCEPTOR (AUTO ADD TOKEN)
 api.interceptors.request.use((config) => {
     console.log("🔥 INTERCEPTOR RUNNING");
-  const token = localStorage.getItem("token");
-
+  
   console.log("🔥 INTERCEPTOR TOKEN:", token); // debug
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
 
   return config;
 });
